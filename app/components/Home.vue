@@ -85,7 +85,16 @@
 			</GridLayout>
 
 			<GridLayout v-show="selectedTabview == 1" row="2" width="100%" backgroundColor="white">		
-				
+				<ScrollView>
+					<ListView for="item in links" class="list-group">
+						<v-template>
+							<GridLayout class="list-group-item" rows="*" columns="auto, *">
+								<!-- <Image row="0" col="0" :src="item.src" class="thumb img-circle" /> -->
+								<Label row="0" col="1" :text="'https://5592775c.ngrok.io/'+item.urlCode" />
+							</GridLayout>
+						</v-template>
+					</ListView>
+				</ScrollView>
 			</GridLayout>
 
 			<GridLayout v-show="selectedTabview == 2" row="2" width="100%" backgroundColor="white">		
@@ -107,19 +116,32 @@
 	const gestures = require("ui/gestures"); 
 	const app = require("application");
 	const dialog = require("tns-core-modules/ui/dialogs");
+	const appSettings = require("tns-core-modules/application-settings");
 
 export default {
 	components: {
 		Item,
 		Category
 	},
-	computed: {
-		itemsCategory(){
-			return this.category.slice().reverse();
-		}
-	},
 	mounted () {
 		// SwissArmyKnife.setAndroidStatusBarColor("#b51213");
+	},
+	created(){
+		this.ownerId = appSettings.getString("ownerId", '');
+		if(this.ownerId.length != ''){
+			http.request({
+				url: "https://5592775c.ngrok.io/api/getGuestLinks?masterkey=" + this.ownerId,
+				method: "GET"
+			}).then(response => {
+				this.links = JSON.parse(response.content);
+				console.log(JSON.parse(response.content))
+			}, error => {
+				dialog.alert({
+					title: "Error",
+					message: "Couldn't connect to server."
+				});
+			})
+		}
 	},
 	data() {
 		return {
@@ -134,6 +156,9 @@ export default {
 			file: '',
 			showShort: false,
 			shorted: '',
+			ownerId: '',
+
+			links: []
 		};
 	},
 	methods: {
@@ -154,9 +179,13 @@ export default {
 		},
 
 		copyToClip(){
-
+			var clipboard = require("nativescript-clipboard");
+			clipboard.setText(this.shorted).then(function(){
+				console.log("OK, copied to the clipboard");
+			});
 		},
 		tryAnother(){
+			this.to_short = '';
 			this.showShort = false;
 		},
 		submit(){
@@ -177,7 +206,8 @@ export default {
 					"Content-Type": "application/json"
 				},
 				content: JSON.stringify({
-					originalUrl: this.to_short
+					originalUrl: this.to_short,
+					masterkey: this.ownerId
 				})
 			}).then(resp => {
 				let r = JSON.parse(resp.content);
@@ -189,6 +219,10 @@ export default {
 					});
 				}else{
 					this.shorted = "https://5592775c.ngrok.io/" + r.urlCode;
+					if(appSettings.getString("ownerId", '') == ''){
+						appSettings.setString("ownerId", r.ownerId);
+					}
+					this.links.push({ urlCode: this.shorted, createdAt: r.createdAt })
 					this.showShort = true;
 				}
 

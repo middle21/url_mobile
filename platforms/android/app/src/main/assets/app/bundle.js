@@ -261,6 +261,15 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
 // import { SwissArmyKnife } from "nativescript-swiss-army-knife";
 
 
@@ -274,19 +283,34 @@ const app = __webpack_require__("../node_modules/tns-core-modules/application/ap
 
 const dialog = __webpack_require__("tns-core-modules/ui/dialogs");
 
+const appSettings = __webpack_require__("tns-core-modules/application-settings");
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
     Item: _custom_item__WEBPACK_IMPORTED_MODULE_1__["default"],
     Category: _custom_category__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
-  computed: {
-    itemsCategory() {
-      return this.category.slice().reverse();
-    }
-
-  },
 
   mounted() {// SwissArmyKnife.setAndroidStatusBarColor("#b51213");
+  },
+
+  created() {
+    this.ownerId = appSettings.getString("ownerId", '');
+
+    if (this.ownerId.length != '') {
+      http__WEBPACK_IMPORTED_MODULE_4__["request"]({
+        url: "https://5592775c.ngrok.io/api/getGuestLinks?masterkey=" + this.ownerId,
+        method: "GET"
+      }).then(response => {
+        this.links = JSON.parse(response.content);
+        console.log(JSON.parse(response.content));
+      }, error => {
+        dialog.alert({
+          title: "Error",
+          message: "Couldn't connect to server."
+        });
+      });
+    }
   },
 
   data() {
@@ -301,7 +325,9 @@ const dialog = __webpack_require__("tns-core-modules/ui/dialogs");
       folder: '',
       file: '',
       showShort: false,
-      shorted: ''
+      shorted: '',
+      ownerId: '',
+      links: []
     };
   },
 
@@ -326,9 +352,16 @@ const dialog = __webpack_require__("tns-core-modules/ui/dialogs");
       this.selectedTabview = 2;
     },
 
-    copyToClip() {},
+    copyToClip() {
+      var clipboard = __webpack_require__("../node_modules/nativescript-clipboard/clipboard.js");
+
+      clipboard.setText(this.shorted).then(function () {
+        console.log("OK, copied to the clipboard");
+      });
+    },
 
     tryAnother() {
+      this.to_short = '';
       this.showShort = false;
     },
 
@@ -352,7 +385,8 @@ const dialog = __webpack_require__("tns-core-modules/ui/dialogs");
           "Content-Type": "application/json"
         },
         content: JSON.stringify({
-          originalUrl: this.to_short
+          originalUrl: this.to_short,
+          masterkey: this.ownerId
         })
       }).then(resp => {
         let r = JSON.parse(resp.content);
@@ -365,6 +399,15 @@ const dialog = __webpack_require__("tns-core-modules/ui/dialogs");
           });
         } else {
           this.shorted = "https://5592775c.ngrok.io/" + r.urlCode;
+
+          if (appSettings.getString("ownerId", '') == '') {
+            appSettings.setString("ownerId", r.ownerId);
+          }
+
+          this.links.push({
+            urlCode: this.shorted,
+            createdAt: r.createdAt
+          });
           this.showShort = true;
         }
 
@@ -1563,17 +1606,71 @@ var render = function() {
             ],
             1
           ),
-          _c("GridLayout", {
-            directives: [
-              {
-                name: "show",
-                rawName: "v-show",
-                value: _vm.selectedTabview == 1,
-                expression: "selectedTabview == 1"
-              }
+          _c(
+            "GridLayout",
+            {
+              directives: [
+                {
+                  name: "show",
+                  rawName: "v-show",
+                  value: _vm.selectedTabview == 1,
+                  expression: "selectedTabview == 1"
+                }
+              ],
+              attrs: { row: "2", width: "100%", backgroundColor: "white" }
+            },
+            [
+              _c(
+                "ScrollView",
+                [
+                  _c(
+                    "ListView",
+                    {
+                      staticClass: "list-group",
+                      attrs: { items: _vm.links, "+alias": "item" }
+                    },
+                    [
+                      _c("v-template", {
+                        scopedSlots: _vm._u([
+                          {
+                            key: "default",
+                            fn: function(ref) {
+                              var item = ref.item
+                              var $index = ref.$index
+                              var $even = ref.$even
+                              var $odd = ref.$odd
+                              return _c(
+                                "GridLayout",
+                                {
+                                  staticClass: "list-group-item",
+                                  attrs: { rows: "*", columns: "auto, *" }
+                                },
+                                [
+                                  _c("Label", {
+                                    attrs: {
+                                      row: "0",
+                                      col: "1",
+                                      text:
+                                        "https://5592775c.ngrok.io/" +
+                                        item.urlCode
+                                    }
+                                  })
+                                ],
+                                1
+                              )
+                            }
+                          }
+                        ])
+                      })
+                    ],
+                    1
+                  )
+                ],
+                1
+              )
             ],
-            attrs: { row: "2", width: "100%", backgroundColor: "white" }
-          }),
+            1
+          ),
           _c("GridLayout", {
             directives: [
               {
@@ -2916,6 +3013,13 @@ module.exports = require("nativescript-vue");
 /***/ (function(module, exports) {
 
 module.exports = require("tns-core-modules/application");
+
+/***/ }),
+
+/***/ "tns-core-modules/application-settings":
+/***/ (function(module, exports) {
+
+module.exports = require("tns-core-modules/application-settings");
 
 /***/ }),
 
