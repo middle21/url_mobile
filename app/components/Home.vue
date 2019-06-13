@@ -11,7 +11,7 @@
 							src="~/assets/images/search.png" />
 					<Image col="2" row="0" @tap="bell" horizontalAlignment="right" class="status-img"
 							src="~/assets/images/bell.png" /> -->
-					<Image horizontalAlignment="right" stretch="aspectFill" col="3"
+					<Image horizontalAlignment="right" @tap="profile" stretch="aspectFill" col="3"
 							row="0" class="status-profile" src="~/assets/images/me.png" />
 			</GridLayout>
 
@@ -100,6 +100,10 @@
 			<GridLayout v-show="selectedTabview == 2" row="2" width="100%" backgroundColor="white">		
 			</GridLayout>
 
+			<GridLayout v-show="selectedTabview == 3" row="2" width="100%" backgroundColor="white">	
+					<ProfileManager></ProfileManager>
+			</GridLayout>
+
 			
 
 		</GridLayout>
@@ -108,10 +112,8 @@
 <script>
 	// import { SwissArmyKnife } from "nativescript-swiss-army-knife";
 	import { isIOS, isAndroid } from 'tns-core-modules/platform'
-	import Item from "./custom/item";
-	import Category from "./custom/category";
-	import ItemDetails from "./ItemDetails";
 	import * as http from "http";
+	import ProfileManager from './ProfileManager.vue';
 
 	const gestures = require("ui/gestures"); 
 	const app = require("application");
@@ -120,8 +122,7 @@
 
 export default {
 	components: {
-		Item,
-		Category
+		ProfileManager
 	},
 	mounted () {
 		// SwissArmyKnife.setAndroidStatusBarColor("#b51213");
@@ -162,8 +163,8 @@ export default {
 		};
 	},
 	methods: {
-		search(){
-			console.log('search');
+		profile(){
+			this.selectedTabview = 3;
 		},
 		bell(){
 			console.log('bell');
@@ -222,7 +223,7 @@ export default {
 					if(appSettings.getString("ownerId", '') == ''){
 						appSettings.setString("ownerId", r.ownerId);
 					}
-					this.links.push({ urlCode: this.shorted, createdAt: r.createdAt })
+					this.links.push({ urlCode: r.urlCode, createdAt: r.createdAt })
 					this.showShort = true;
 				}
 
