@@ -272,6 +272,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 // import { SwissArmyKnife } from "nativescript-swiss-army-knife";
 
 
@@ -290,33 +291,10 @@ const appSettings = __webpack_require__("tns-core-modules/application-settings")
     ProfileManager: _ProfileManager_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
 
-  mounted() {// SwissArmyKnife.setAndroidStatusBarColor("#b51213");
-  },
-
-  created() {
-    this.ownerId = appSettings.getString("ownerId", '');
-
-    if (this.ownerId.length != '') {
-      http__WEBPACK_IMPORTED_MODULE_1__["request"]({
-        url: "https://5592775c.ngrok.io/api/getGuestLinks?masterkey=" + this.ownerId,
-        method: "GET"
-      }).then(response => {
-        this.links = JSON.parse(response.content);
-        console.log(JSON.parse(response.content));
-      }, error => {
-        dialog.alert({
-          title: "Error",
-          message: "Couldn't connect to server."
-        });
-      });
-    }
-  },
-
   data() {
     return {
       lastDelY: 0,
       headerCollapsed: false,
-      selectedTab: 0,
       selectedTabview: 0,
       processing: false,
       to_short: '',
@@ -326,6 +304,7 @@ const appSettings = __webpack_require__("tns-core-modules/application-settings")
       showShort: false,
       shorted: '',
       ownerId: '',
+      token: '',
       links: []
     };
   },
@@ -349,6 +328,35 @@ const appSettings = __webpack_require__("tns-core-modules/application-settings")
 
     aboutUs() {
       this.selectedTabview = 2;
+    },
+
+    logout() {
+      this.selectedTabview = 0;
+      this.token = '';
+      this.links = [];
+      this.ownerId = '';
+      appSettings.remove('ownerId');
+    },
+
+    updateToken(e) {
+      this.token = e;
+    },
+
+    getLinks() {
+      http__WEBPACK_IMPORTED_MODULE_1__["request"]({
+        url: 'https://f38a0742.ngrok.io/api/getMyLinks',
+        method: "GET",
+        headers: {
+          "access-token": this.token
+        }
+      }).then(response => {
+        this.links = JSON.parse(response.content);
+      }, error => {
+        dialog.alert({
+          title: "Error",
+          message: "Couldn't connect to server."
+        });
+      });
     },
 
     copyToClip() {
@@ -378,7 +386,7 @@ const appSettings = __webpack_require__("tns-core-modules/application-settings")
       }
 
       http__WEBPACK_IMPORTED_MODULE_1__["request"]({
-        url: "https://5592775c.ngrok.io/api/item",
+        url: "https://f38a0742.ngrok.io/api/item",
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -397,7 +405,7 @@ const appSettings = __webpack_require__("tns-core-modules/application-settings")
             okButtonText: "Retry"
           });
         } else {
-          this.shorted = "https://5592775c.ngrok.io/" + r.urlCode;
+          this.shorted = "https://f38a0742.ngrok.io/" + r.urlCode;
 
           if (appSettings.getString("ownerId", '') == '') {
             appSettings.setString("ownerId", r.ownerId);
@@ -422,6 +430,269 @@ const appSettings = __webpack_require__("tns-core-modules/application-settings")
       });
     }
 
+  },
+
+  created() {
+    this.token = appSettings.getString('token', '');
+
+    if (this.token.length > 1) {
+      http__WEBPACK_IMPORTED_MODULE_1__["request"]({
+        url: 'https://f38a0742.ngrok.io/api/getMyLinks',
+        method: "GET",
+        headers: {
+          "access-token": this.token
+        }
+      }).then(response => {
+        this.links = JSON.parse(response.content);
+      }, error => {
+        dialog.alert({
+          title: "Error",
+          message: "Couldn't connect to server."
+        });
+      });
+    } else {
+      this.ownerId = appSettings.getString("ownerId", '');
+
+      if (this.ownerId.length != '') {
+        http__WEBPACK_IMPORTED_MODULE_1__["request"]({
+          url: "https://f38a0742.ngrok.io/api/getGuestLinks?masterkey=" + this.ownerId,
+          method: "GET"
+        }).then(response => {
+          this.links = JSON.parse(response.content);
+        }, error => {
+          dialog.alert({
+            title: "Error",
+            message: "Couldn't connect to server."
+          });
+        });
+      }
+    }
+  },
+
+  watch: {
+    token(newval, oldval) {
+      appSettings.setString('token', newval);
+
+      if (newval == '') {
+        this.links = [];
+      }
+    }
+
+  },
+
+  mounted() {}
+
+});
+
+/***/ }),
+
+/***/ "../node_modules/babel-loader/lib/index.js!../node_modules/vue-loader/lib/index.js?!./components/Login.vue?vue&type=script&lang=js&":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var http__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../node_modules/tns-core-modules/http/http.js");
+/* harmony import */ var http__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(http__WEBPACK_IMPORTED_MODULE_0__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+const dialog = __webpack_require__("tns-core-modules/ui/dialogs");
+
+const appSettings = __webpack_require__("tns-core-modules/application-settings");
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data() {
+    return {
+      processing: false,
+      email: '',
+      password: '',
+      password2: '',
+      username: '',
+      toggleRegister: false
+    };
+  },
+
+  methods: {
+    register() {
+      this.toggleRegister = true;
+    },
+
+    registerPost() {},
+
+    login() {
+      this.processing = true;
+      http__WEBPACK_IMPORTED_MODULE_0__["request"]({
+        url: "https://f38a0742.ngrok.io/login",
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        content: JSON.stringify({
+          email: this.email,
+          password: this.password
+        })
+      }).then(response => {
+        let resp = JSON.parse(response.content);
+
+        if (!resp.error) {
+          this.$emit('loggedinevent', resp);
+          this.processing = false;
+        } else {
+          this.processing = false;
+          dialog.alert({
+            title: 'Error',
+            message: 'Authentification failed.',
+            okButtonText: 'Retry'
+          });
+          return false;
+        }
+      }, error => {
+        this.processing = false;
+        dialog.alert({
+          title: 'Error',
+          message: 'Error.',
+          okButtonText: 'Ok'
+        });
+        return false;
+      });
+    }
+
+  }
+});
+
+/***/ }),
+
+/***/ "../node_modules/babel-loader/lib/index.js!../node_modules/vue-loader/lib/index.js?!./components/Profile.vue?vue&type=script&lang=js&":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  methods: {
+    resetPassword() {},
+
+    links() {
+      this.$parent.$emit('links', 1);
+    },
+
+    logout() {
+      this.$parent.$emit('logout', 1);
+    }
+
   }
 });
 
@@ -432,13 +703,48 @@ const appSettings = __webpack_require__("tns-core-modules/application-settings")
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Login_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./components/Login.vue");
+/* harmony import */ var _Profile_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./components/Profile.vue");
 //
 //
 //
 //
+//
+//
+//
+//
+//
+//
+
+
 /* harmony default export */ __webpack_exports__["default"] = ({
+  props: ['token'],
+  components: {
+    Login: _Login_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
+    Profile: _Profile_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
+  },
+
   data() {
     return {};
+  },
+
+  methods: {
+    loggedin(e) {
+      this.$emit('updateToken', e);
+      this.$emit('getLinks', 1);
+    }
+
+  },
+
+  created() {},
+
+  mounted() {
+    this.$on('links', () => {
+      this.$parent.$emit('links', 1);
+    });
+    this.$on('logout', () => {
+      this.$parent.$emit('logout', 1);
+    });
   }
 
 });
@@ -454,6 +760,33 @@ exports = module.exports = __webpack_require__("../node_modules/css-loader/lib/c
 
 // module
 exports.push([module.i, "\n.tabview.active {\r\n\tborder-bottom-color: white;\r\n\tborder-bottom-width: 3;\r\n\tmargin: 0;\r\n\theight: 50;\n}\n.tabviewText {\r\n\tmargin-top: 15;\r\n\tmargin-bottom: 5;\r\n\tfont-size: 13;\r\n\tcolor: #d8d2d2;\r\n\thorizontal-align: center;\n}\n.tabviewText.active {\r\n\tmargin-top: 0;\r\n\tmargin-bottom: 5;\r\n\tfont-weight: bold;\r\n\tcolor: white;\r\n\tvertical-align: center;\n}\n.navTab {\r\n\tbackground-color: #7957D5;\n}\n.navTabview {\r\n\tbackground-color: blue;\n}\n.status-img {\r\n\tmargin-top: 4;\r\n\tmargin-right: 20;\r\n\twidth: 30;\r\n\theight: 30;\n}\n.status-profile {\r\n\tborder-width: 1;\r\n\tborder-color: #ffffff;\r\n\tbackground-color: #f1ebeb;\r\n\tborder-radius: 50%;\r\n\tmargin-top: 4;\r\n\tmargin-right: 15;\r\n\twidth: 30;\r\n\theight: 30;\n}\n.status-title {\r\n\tcolor: white;\r\n\tfont-size: 18;\r\n\tmargin-left: 15;\r\n\tmargin-top: 8;\r\n\thorizontal-align: left;\r\n\tvertical-align: center;\n}\n.form {\r\n    margin-left: 30;\r\n    margin-right: 30;\r\n    margin-top: 40;\r\n    flex-grow: 2;\n}\n.logo {\r\n    margin-bottom: 12;\r\n    height: 90;\r\n    font-weight: bold;\n}\n.header {\r\n    horizontal-align: center;\r\n    font-size: 25;\r\n    font-weight: 600;\r\n    margin-bottom: 30;\r\n    text-align: center;\r\n    color: #7957D5;\n}\n.input-field {\r\n    margin-bottom: 25;\n}\n.input {\r\n    font-size: 18;\r\n    placeholder-color: #A8A8A8;\n}\n.input:disabled {\r\n    background-color: white;\r\n    opacity: 0.5;\n}\n.btn-primary {\r\n    margin: 30 5 15 5;\n}\n.footerTitle {\r\n\tmargin-top:20;\r\n\tcolor: #363636;\r\n    font-size: 24;\r\n    font-weight: 600;\r\n    line-height: 600;\n}\n.footerSubtitle {\r\n\tcolor: #4a4a4a;\r\n    font-size: 19;\r\n    font-weight: 400;\r\n    line-height: 400;\n}\r\n", ""]);
+
+// exports
+
+    const application = __webpack_require__("tns-core-modules/application");
+    __webpack_require__("tns-core-modules/ui/styling/style-scope");
+
+    exports.forEach(cssExport => {
+        if (cssExport.length > 1 && cssExport[1]) {
+            // applying the second item of the export as it contains the css contents
+            application.addCss(cssExport[1]);
+        }
+    });
+    ;
+    if (false) {}
+
+
+/***/ }),
+
+/***/ "../node_modules/nativescript-dev-webpack/style-hot-loader.js!../node_modules/nativescript-dev-webpack/apply-css-loader.js!../node_modules/css-loader/index.js?!../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../node_modules/vue-loader/lib/index.js?!./components/Login.vue?vue&type=style&index=0&id=c27482c4&scoped=true&lang=css&":
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__("../node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "\n.login-label[data-v-c27482c4] {\n    horizontal-align: center;\n    color: #A8A8A8;\n    font-size: 16;\n}\n.sign-up-label[data-v-c27482c4] {\n    margin-bottom: 20;\n}\n.bold[data-v-c27482c4] {\n    color: #000000;\n} \n", ""]);
 
 // exports
 
@@ -833,54 +1166,59 @@ var render = function() {
               attrs: { row: "2", width: "100%", backgroundColor: "white" }
             },
             [
-              _c(
-                "ScrollView",
-                [
-                  _c(
-                    "ListView",
-                    {
-                      staticClass: "list-group",
-                      attrs: { items: _vm.links, "+alias": "item" }
-                    },
+              _vm.links.length > 0
+                ? _c(
+                    "ScrollView",
                     [
-                      _c("v-template", {
-                        scopedSlots: _vm._u([
-                          {
-                            key: "default",
-                            fn: function(ref) {
-                              var item = ref.item
-                              var $index = ref.$index
-                              var $even = ref.$even
-                              var $odd = ref.$odd
-                              return _c(
-                                "GridLayout",
-                                {
-                                  staticClass: "list-group-item",
-                                  attrs: { rows: "*", columns: "auto, *" }
-                                },
-                                [
-                                  _c("Label", {
-                                    attrs: {
-                                      row: "0",
-                                      col: "1",
-                                      text:
-                                        "https://5592775c.ngrok.io/" +
-                                        item.urlCode
-                                    }
-                                  })
-                                ],
-                                1
-                              )
-                            }
-                          }
-                        ])
-                      })
+                      _c(
+                        "ListView",
+                        {
+                          staticClass: "list-group",
+                          attrs: { items: _vm.links, "+alias": "item" }
+                        },
+                        [
+                          _c("v-template", {
+                            scopedSlots: _vm._u([
+                              {
+                                key: "default",
+                                fn: function(ref) {
+                                  var item = ref.item
+                                  var $index = ref.$index
+                                  var $even = ref.$even
+                                  var $odd = ref.$odd
+                                  return _c(
+                                    "GridLayout",
+                                    {
+                                      staticClass: "list-group-item",
+                                      attrs: { rows: "*", columns: "auto, *" }
+                                    },
+                                    [
+                                      _c("Label", {
+                                        attrs: {
+                                          row: "0",
+                                          col: "1",
+                                          text:
+                                            "https://f38a0742.ngrok.io/" +
+                                            item.urlCode
+                                        }
+                                      })
+                                    ],
+                                    1
+                                  )
+                                }
+                              }
+                            ])
+                          })
+                        ],
+                        1
+                      )
                     ],
                     1
                   )
-                ],
-                1
-              )
+                : _c("Label", {
+                    staticStyle: { marginTop: "20", horizontalAlign: "center" },
+                    attrs: { text: "You have zero links." }
+                  })
             ],
             1
           ),
@@ -908,9 +1246,331 @@ var render = function() {
               ],
               attrs: { row: "2", width: "100%", backgroundColor: "white" }
             },
-            [_c("ProfileManager")],
+            [
+              _c("ProfileManager", {
+                attrs: { token: _vm.token },
+                on: {
+                  getLinks: _vm.getLinks,
+                  updateToken: _vm.updateToken,
+                  logout: _vm.logout,
+                  links: _vm.mylinks
+                }
+              })
+            ],
             1
           )
+        ],
+        1
+      )
+    ],
+    1
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "../node_modules/vue-loader/lib/loaders/templateLoader.js?!../node_modules/vue-loader/lib/index.js?!./components/Login.vue?vue&type=template&id=c27482c4&scoped=true&":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "StackLayout",
+    { staticClass: "page" },
+    [
+      !_vm.toggleRegister
+        ? _c(
+            "StackLayout",
+            { staticClass: "form" },
+            [
+              _c("Label", {
+                staticClass: "header",
+                attrs: { text: "'Login'" }
+              }),
+              _c(
+                "GridLayout",
+                { attrs: { rows: "auto, auto, auto" } },
+                [
+                  _c(
+                    "StackLayout",
+                    { staticClass: "input-field", attrs: { row: "1" } },
+                    [
+                      _c("TextField", {
+                        ref: "email",
+                        staticClass: "input",
+                        staticStyle: { marginBottom: "20" },
+                        attrs: {
+                          isEnabled: !_vm.processing,
+                          hint: "Email",
+                          text: _vm.email
+                        },
+                        on: {
+                          textChange: function($event) {
+                            _vm.email = $event.value
+                          }
+                        }
+                      }),
+                      _c("StackLayout", { staticClass: "hr-light" })
+                    ],
+                    1
+                  ),
+                  _c(
+                    "StackLayout",
+                    { staticClass: "input-field", attrs: { row: "2" } },
+                    [
+                      _c("TextField", {
+                        ref: "password",
+                        staticClass: "input",
+                        attrs: {
+                          isEnabled: !_vm.processing,
+                          hint: "Password",
+                          secure: "true",
+                          text: _vm.password
+                        },
+                        on: {
+                          textChange: function($event) {
+                            _vm.password = $event.value
+                          }
+                        }
+                      }),
+                      _c("StackLayout", { staticClass: "hr-light" })
+                    ],
+                    1
+                  ),
+                  _c("ActivityIndicator", {
+                    attrs: { rowSpan: "3", busy: _vm.processing }
+                  })
+                ],
+                1
+              ),
+              _c("Button", {
+                staticClass: "btn btn-primary m-t-20",
+                attrs: {
+                  text: "Login",
+                  isEnabled: !_vm.processing,
+                  backgroundColor: "#7957D5"
+                },
+                on: { tap: _vm.login }
+              }),
+              _c("Label", {
+                staticStyle: { horizontalAlign: "center" },
+                attrs: { text: "Don't have an account ?" }
+              }),
+              _c("Label", {
+                staticStyle: { horizontalAlign: "center" },
+                attrs: { text: "Sign up" },
+                on: { tap: _vm.register }
+              })
+            ],
+            1
+          )
+        : _c(
+            "StackLayout",
+            { staticClass: "form" },
+            [
+              _c("Label", {
+                staticClass: "header",
+                attrs: { text: "'Register'" }
+              }),
+              _c(
+                "GridLayout",
+                { attrs: { rows: "auto, auto, auto, auto, auto" } },
+                [
+                  _c(
+                    "StackLayout",
+                    { staticClass: "input-field", attrs: { row: "1" } },
+                    [
+                      _c("TextField", {
+                        ref: "email",
+                        staticClass: "input",
+                        attrs: {
+                          isEnabled: !_vm.processing,
+                          hint: "Email",
+                          text: _vm.email
+                        },
+                        on: {
+                          textChange: function($event) {
+                            _vm.email = $event.value
+                          }
+                        }
+                      }),
+                      _c("StackLayout", { staticClass: "hr-light" })
+                    ],
+                    1
+                  ),
+                  _c(
+                    "StackLayout",
+                    { staticClass: "input-field", attrs: { row: "2" } },
+                    [
+                      _c("TextField", {
+                        ref: "username",
+                        staticClass: "input",
+                        attrs: {
+                          isEnabled: !_vm.processing,
+                          hint: "Username",
+                          text: _vm.username
+                        },
+                        on: {
+                          textChange: function($event) {
+                            _vm.username = $event.value
+                          }
+                        }
+                      }),
+                      _c("StackLayout", { staticClass: "hr-light" })
+                    ],
+                    1
+                  ),
+                  _c(
+                    "StackLayout",
+                    { staticClass: "input-field", attrs: { row: "3" } },
+                    [
+                      _c("TextField", {
+                        ref: "password",
+                        staticClass: "input",
+                        attrs: {
+                          isEnabled: !_vm.processing,
+                          hint: "Password",
+                          secure: "true",
+                          text: _vm.password
+                        },
+                        on: {
+                          textChange: function($event) {
+                            _vm.password = $event.value
+                          }
+                        }
+                      }),
+                      _c("StackLayout", { staticClass: "hr-light" })
+                    ],
+                    1
+                  ),
+                  _c(
+                    "StackLayout",
+                    { staticClass: "input-field", attrs: { row: "4" } },
+                    [
+                      _c("TextField", {
+                        ref: "password2",
+                        staticClass: "input",
+                        attrs: {
+                          isEnabled: !_vm.processing,
+                          hint: "Re-type password",
+                          secure: "true",
+                          text: _vm.password2
+                        },
+                        on: {
+                          textChange: function($event) {
+                            _vm.password2 = $event.value
+                          }
+                        }
+                      }),
+                      _c("StackLayout", { staticClass: "hr-light" })
+                    ],
+                    1
+                  ),
+                  _c("ActivityIndicator", {
+                    attrs: { rowSpan: "5", busy: _vm.processing }
+                  })
+                ],
+                1
+              ),
+              _c("Button", {
+                staticClass: "btn btn-primary m-t-20",
+                attrs: {
+                  text: "Register",
+                  isEnabled: !_vm.processing,
+                  backgroundColor: "#7957D5"
+                },
+                on: { tap: _vm.registerPost }
+              }),
+              _c("Label", {
+                staticStyle: { horizontalAlign: "center" },
+                attrs: { text: "Back to login" },
+                on: {
+                  tap: function($event) {
+                    _vm.toggleRegister = false
+                  }
+                }
+              })
+            ],
+            1
+          )
+    ],
+    1
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "../node_modules/vue-loader/lib/loaders/templateLoader.js?!../node_modules/vue-loader/lib/index.js?!./components/Profile.vue?vue&type=template&id=010534c4&":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "StackLayout",
+    { staticClass: "page" },
+    [
+      _c(
+        "StackLayout",
+        { staticClass: "form" },
+        [
+          _c("Image", {
+            staticClass: "logo",
+            attrs: { src: "~/assets/images/me.png" }
+          }),
+          _c(
+            "GridLayout",
+            { attrs: { rows: "auto, auto, auto" } },
+            [
+              _c(
+                "StackLayout",
+                { staticClass: "input-field", attrs: { row: "1" } },
+                [_c("StackLayout", { staticClass: "hr-light" })],
+                1
+              ),
+              _c(
+                "StackLayout",
+                { staticClass: "input-field", attrs: { row: "2" } },
+                [_c("StackLayout", { staticClass: "hr-light" })],
+                1
+              )
+            ],
+            1
+          ),
+          _c("Button", {
+            staticClass: "btn btn-primary m-t-20",
+            attrs: { text: "Reset your password", backgroundColor: "#7957D5" },
+            on: { tap: _vm.resetPassword }
+          }),
+          _c("Button", {
+            staticClass: "btn btn-primary m-t-20",
+            attrs: { text: "Your links", backgroundColor: "#7957D5" },
+            on: { tap: _vm.links }
+          }),
+          _c("Button", {
+            staticClass: "btn btn-primary m-t-20",
+            attrs: { text: "Logout", backgroundColor: "#7957D5" },
+            on: { tap: _vm.logout }
+          })
         ],
         1
       )
@@ -936,7 +1596,17 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("Label", { attrs: { row: "0", col: "1", text: "profile manager" } })
+  return _c(
+    "FlexboxLayout",
+    [
+      (_vm.token.length > 1
+      ? false
+      : true)
+        ? _c("Login", { on: { loggedinevent: _vm.loggedin } })
+        : _c("Profile")
+    ],
+    1
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -1132,6 +1802,134 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Home_vue_vue_type_template_id_67410f3a___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Home_vue_vue_type_template_id_67410f3a___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./components/Login.vue":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Login_vue_vue_type_template_id_c27482c4_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./components/Login.vue?vue&type=template&id=c27482c4&scoped=true&");
+/* harmony import */ var _Login_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./components/Login.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _Login_vue_vue_type_style_index_0_id_c27482c4_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("./components/Login.vue?vue&type=style&index=0&id=c27482c4&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__("../node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
+  _Login_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _Login_vue_vue_type_template_id_c27482c4_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _Login_vue_vue_type_template_id_c27482c4_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  "c27482c4",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "components/Login.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./components/Login.vue?vue&type=script&lang=js&":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_Login_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../node_modules/babel-loader/lib/index.js!../node_modules/vue-loader/lib/index.js?!./components/Login.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_Login_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./components/Login.vue?vue&type=style&index=0&id=c27482c4&scoped=true&lang=css&":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_nativescript_dev_webpack_style_hot_loader_js_node_modules_nativescript_dev_webpack_apply_css_loader_js_node_modules_css_loader_index_js_ref_1_2_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_vue_loader_lib_index_js_vue_loader_options_Login_vue_vue_type_style_index_0_id_c27482c4_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../node_modules/nativescript-dev-webpack/style-hot-loader.js!../node_modules/nativescript-dev-webpack/apply-css-loader.js!../node_modules/css-loader/index.js?!../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../node_modules/vue-loader/lib/index.js?!./components/Login.vue?vue&type=style&index=0&id=c27482c4&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_nativescript_dev_webpack_style_hot_loader_js_node_modules_nativescript_dev_webpack_apply_css_loader_js_node_modules_css_loader_index_js_ref_1_2_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_vue_loader_lib_index_js_vue_loader_options_Login_vue_vue_type_style_index_0_id_c27482c4_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_nativescript_dev_webpack_style_hot_loader_js_node_modules_nativescript_dev_webpack_apply_css_loader_js_node_modules_css_loader_index_js_ref_1_2_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_vue_loader_lib_index_js_vue_loader_options_Login_vue_vue_type_style_index_0_id_c27482c4_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_nativescript_dev_webpack_style_hot_loader_js_node_modules_nativescript_dev_webpack_apply_css_loader_js_node_modules_css_loader_index_js_ref_1_2_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_vue_loader_lib_index_js_vue_loader_options_Login_vue_vue_type_style_index_0_id_c27482c4_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_nativescript_dev_webpack_style_hot_loader_js_node_modules_nativescript_dev_webpack_apply_css_loader_js_node_modules_css_loader_index_js_ref_1_2_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_vue_loader_lib_index_js_vue_loader_options_Login_vue_vue_type_style_index_0_id_c27482c4_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_nativescript_dev_webpack_style_hot_loader_js_node_modules_nativescript_dev_webpack_apply_css_loader_js_node_modules_css_loader_index_js_ref_1_2_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_vue_loader_lib_index_js_vue_loader_options_Login_vue_vue_type_style_index_0_id_c27482c4_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default.a); 
+
+/***/ }),
+
+/***/ "./components/Login.vue?vue&type=template&id=c27482c4&scoped=true&":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Login_vue_vue_type_template_id_c27482c4_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../node_modules/vue-loader/lib/loaders/templateLoader.js?!../node_modules/vue-loader/lib/index.js?!./components/Login.vue?vue&type=template&id=c27482c4&scoped=true&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Login_vue_vue_type_template_id_c27482c4_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Login_vue_vue_type_template_id_c27482c4_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./components/Profile.vue":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Profile_vue_vue_type_template_id_010534c4___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./components/Profile.vue?vue&type=template&id=010534c4&");
+/* harmony import */ var _Profile_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./components/Profile.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("../node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _Profile_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _Profile_vue_vue_type_template_id_010534c4___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _Profile_vue_vue_type_template_id_010534c4___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "components/Profile.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./components/Profile.vue?vue&type=script&lang=js&":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_Profile_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../node_modules/babel-loader/lib/index.js!../node_modules/vue-loader/lib/index.js?!./components/Profile.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_Profile_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./components/Profile.vue?vue&type=template&id=010534c4&":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Profile_vue_vue_type_template_id_010534c4___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../node_modules/vue-loader/lib/loaders/templateLoader.js?!../node_modules/vue-loader/lib/index.js?!./components/Profile.vue?vue&type=template&id=010534c4&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Profile_vue_vue_type_template_id_010534c4___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Profile_vue_vue_type_template_id_010534c4___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 

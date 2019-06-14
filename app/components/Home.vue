@@ -85,23 +85,24 @@
 			</GridLayout>
 
 			<GridLayout v-show="selectedTabview == 1" row="2" width="100%" backgroundColor="white">		
-				<ScrollView>
+				<ScrollView v-if="links.length > 0">
 					<ListView for="item in links" class="list-group">
 						<v-template>
 							<GridLayout class="list-group-item" rows="*" columns="auto, *">
 								<!-- <Image row="0" col="0" :src="item.src" class="thumb img-circle" /> -->
-								<Label row="0" col="1" :text="'https://5592775c.ngrok.io/'+item.urlCode" />
+								<Label row="0" col="1" :text="'https://f38a0742.ngrok.io/'+item.urlCode" />
 							</GridLayout>
 						</v-template>
 					</ListView>
 				</ScrollView>
+				<Label v-else style="margin-top:20;horizontal-align:center;" text="You have zero links."></Label>
 			</GridLayout>
 
 			<GridLayout v-show="selectedTabview == 2" row="2" width="100%" backgroundColor="white">		
 			</GridLayout>
 
 			<GridLayout v-show="selectedTabview == 3" row="2" width="100%" backgroundColor="white">	
-					<ProfileManager></ProfileManager>
+					<ProfileManager @getLinks="getLinks" @updateToken="updateToken" @logout="logout" @links="mylinks" :token="token"></ProfileManager>
 			</GridLayout>
 
 			
@@ -124,31 +125,10 @@ export default {
 	components: {
 		ProfileManager
 	},
-	mounted () {
-		// SwissArmyKnife.setAndroidStatusBarColor("#b51213");
-	},
-	created(){
-		this.ownerId = appSettings.getString("ownerId", '');
-		if(this.ownerId.length != ''){
-			http.request({
-				url: "https://5592775c.ngrok.io/api/getGuestLinks?masterkey=" + this.ownerId,
-				method: "GET"
-			}).then(response => {
-				this.links = JSON.parse(response.content);
-				console.log(JSON.parse(response.content))
-			}, error => {
-				dialog.alert({
-					title: "Error",
-					message: "Couldn't connect to server."
-				});
-			})
-		}
-	},
 	data() {
 		return {
 			lastDelY: 0,
 			headerCollapsed: false,
-			selectedTab: 0,
 			selectedTabview: 0,
 			processing: false,
 			to_short: '',
@@ -158,6 +138,7 @@ export default {
 			showShort: false,
 			shorted: '',
 			ownerId: '',
+			token: '',
 
 			links: []
 		};
@@ -177,6 +158,33 @@ export default {
 		},
 		aboutUs() {
 			this.selectedTabview = 2;
+		},
+		logout() {
+			this.selectedTabview = 0;
+			this.token = '';
+			this.links = [];
+
+			this.ownerId = '';
+			appSettings.remove('ownerId');
+		},
+
+		updateToken(e){
+			this.token = e;
+		},
+
+		getLinks(){
+			http.request({
+				url: 'https://f38a0742.ngrok.io/api/getMyLinks',
+				method: "GET",
+				headers: { "access-token": this.token }
+			}).then(response => {
+				this.links = JSON.parse(response.content);
+			}, error => {
+				dialog.alert({
+					title: "Error",
+					message: "Couldn't connect to server."
+				});
+			});
 		},
 
 		copyToClip(){
@@ -201,7 +209,7 @@ export default {
 				return false;
 			}
 			http.request({
-				url: "https://5592775c.ngrok.io/api/item",
+				url: "https://f38a0742.ngrok.io/api/item",
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json"
@@ -219,7 +227,7 @@ export default {
 						okButtonText: "Retry"
 					});
 				}else{
-					this.shorted = "https://5592775c.ngrok.io/" + r.urlCode;
+					this.shorted = "https://f38a0742.ngrok.io/" + r.urlCode;
 					if(appSettings.getString("ownerId", '') == ''){
 						appSettings.setString("ownerId", r.ownerId);
 					}
@@ -240,6 +248,48 @@ export default {
 
 			
 		}
+	},
+	created(){
+		this.token = appSettings.getString('token', '');
+		if(this.token.length > 1){
+			http.request({
+				url: 'https://f38a0742.ngrok.io/api/getMyLinks',
+				method: "GET",
+				headers: { "access-token": this.token }
+			}).then(response => {
+				this.links = JSON.parse(response.content);
+			}, error => {
+				dialog.alert({
+					title: "Error",
+					message: "Couldn't connect to server."
+				});
+			});
+		}else{
+			this.ownerId = appSettings.getString("ownerId", '');
+			if(this.ownerId.length != ''){
+				http.request({
+					url: "https://f38a0742.ngrok.io/api/getGuestLinks?masterkey=" + this.ownerId,
+					method: "GET"
+				}).then(response => {
+					this.links = JSON.parse(response.content);
+				}, error => {
+					dialog.alert({
+						title: "Error",
+						message: "Couldn't connect to server."
+					});
+				})
+			}
+		}
+	},
+	watch:{
+		token(newval, oldval){
+			appSettings.setString('token',newval);
+			if(newval == ''){
+				this.links = [];
+			}
+		}
+	},
+	mounted(){
 	}
 };
 </script>

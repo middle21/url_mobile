@@ -6,7 +6,6 @@ import Home from './components/Home';
 Vue.config.silent = false;
 
 
-
 import { TNSFontIcon, fonticon } from './nativescript-fonticon';
 TNSFontIcon.debug = false;
 TNSFontIcon.paths = {
@@ -17,7 +16,7 @@ TNSFontIcon.loadCss();
 Vue.filter('fonticon', fonticon);
 
 new Vue({
-	
+    
     render: h => h('frame', [h(Home)])
 
 }).$start();
